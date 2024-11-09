@@ -1,5 +1,5 @@
 # Atlas
-Atlas is a WIP minecraft client focused on scripts / addons
+Atlas is a WIP minecraft client focused on scripts / addons.
 
 ## Features
 - Incomplete script api
