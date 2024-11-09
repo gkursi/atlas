@@ -1,0 +1,14 @@
+{
+  "required": true,
+  "package": "xyz.qweru.atlas.mixin.mixins",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "MinecraftClientMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "client": [
+    "KeyboardMixin"
+  ]
+}
