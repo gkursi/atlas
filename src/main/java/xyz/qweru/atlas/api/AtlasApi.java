@@ -6,6 +6,7 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.entrypoint.EntrypointContainer;
 import net.fabricmc.loader.api.metadata.ModMetadata;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.entity.Entity;
 import org.lwjgl.glfw.GLFW;
 import org.slf4j.LoggerFactory;
 import xyz.qweru.atlas.api.event.impl.KeyEvent;
@@ -21,6 +22,7 @@ import xyz.qweru.atlas.util.annotations.AddonInfo;
 import xyz.qweru.atlas.util.misc.AtlasLogger;
 
 import java.lang.invoke.MethodHandles;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -53,18 +55,7 @@ public final class AtlasApi {
         AtlasScriptExecutor.update();
         logger.debug("Initialized scripts");
         ScriptTest.scriptTest();
-        AtlasScript script = Managers.SCRIPT.add("Test script", "Description :3", """
-                for(var i = 0; i<25; i++) {
-                    logger.info(name + ', ' + description + ', ' + i);
-                    logger.warn("warning!");
-                }
-                """);
-
         logger.debug("Compiled scripts");
-        AtlasScriptExecutor.execute(script);
-        logger.debug("Ran compiled script");
-        SettingTest.settingTest();
-        logger.debug("Finished tests");
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             LOGGER.info("Shutting down");
             AtlasScriptExecutor.stop();

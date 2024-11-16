@@ -1,6 +1,7 @@
 package xyz.qweru.atlas.api.script;
 
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.entity.Entity;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
@@ -8,6 +9,9 @@ import xyz.qweru.atlas.Atlas;
 import xyz.qweru.atlas.api.AtlasApi;
 import xyz.qweru.atlas.api.manager.Manager;
 import xyz.qweru.atlas.api.manager.Managers;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class AtlasScriptExecutor {
@@ -26,8 +30,14 @@ public class AtlasScriptExecutor {
         ctx.close();
     }
 
+    /**
+     * Set value of key,
+     * <b>does not persist across updates!!!</b>
+     * @param key key to access value
+     * @param value value
+     */
     public static void set(String key, Object value) {
-        ScriptableObject.putProperty(scope, key, value);
+        ScriptableObject.putProperty(scope, key, Context.javaToJS(value, scope));
     }
 
     public static void update() {
@@ -45,6 +55,14 @@ public class AtlasScriptExecutor {
         set("world", mc.world);
         set("player", mc.player);
         set("interactions", mc.interactionManager);
+
+        List<Entity> entities = new ArrayList<>();
+        mc.world.getEntities().forEach(entities::add);
+        set("entities", entities);
+
+//        for(Entity entity : entities) {
+//            if(entity.distanceTo(mc.player) < 5) mc.interactionManager.attackEntity(mc.player, entity);
+//        }
     }
 
     public static void execute(AtlasScript script) {

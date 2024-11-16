@@ -14,14 +14,16 @@ public class ScriptTest {
                 """;
 
         String content2 = """
-                if(player) {
-                    logger.info("Player health: {}", mc.player.getHealth());
+                if(player && world) {
+                    for(var entity in Iterator(entities)) {
+                        if(entity.distanceTo(player) < 5 && entity != player) interactions.attackEntity(player, entity);
+                    }
                 } else {
-                    logger.info("Player not loaded yet");
+                    logger.info("Player / world not loaded yet");
                 }
                 """;
 
         Managers.SCRIPT.add("Test script 1", "Test exposed module and script manager objects", content1, GLFW.GLFW_KEY_U);
-        Managers.SCRIPT.add("Test script 2", "Test exposed player object", content2, GLFW.GLFW_KEY_J);
+        Managers.SCRIPT.add("Test script 2", "Example killaura module", content2, GLFW.GLFW_KEY_J);
     }
 }

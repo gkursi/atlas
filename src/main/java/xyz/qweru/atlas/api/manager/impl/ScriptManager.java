@@ -50,11 +50,3 @@ public class ScriptManager extends Manager<AtlasScript> {
         }
     }
 }
-
-/**
- *
- * TODO
- * add more events
- * add dynamic script loading
- *
- */

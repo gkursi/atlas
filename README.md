@@ -2,7 +2,7 @@
 Atlas is a WIP minecraft client focused on scripts / addons.
 
 ## Features
-- Script api
+- Script api based on Rhino JS
 - Module manager
 - Addon manager
 
