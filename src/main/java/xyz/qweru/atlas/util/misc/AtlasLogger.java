@@ -11,6 +11,7 @@ import java.util.List;
 
 /**
  * Wrapper
+ * todo: remove hardcoded class names
  */
 @Todo.WriteDocs
 public class AtlasLogger {
@@ -26,22 +27,26 @@ public class AtlasLogger {
     }
 
     public void info(String msg, Object... args) {
-        String prefix = STACK_WALKER.getCallerClass().getSimpleName() + " > ";
+        String classs = STACK_WALKER.getCallerClass().getSimpleName();
+        String prefix = (classs.startsWith("Script$") || classs.startsWith("MemberBox") ? "Atlas Script" : classs)  + " > ";
         logger.info("{}{}", prefix, fastFormat(msg, List.of(args)));
     }
 
     public void warn(String msg, Object... args) {
-        String prefix = STACK_WALKER.getCallerClass().getSimpleName() + " > ";
+        String classs = STACK_WALKER.getCallerClass().getSimpleName();
+        String prefix = (classs.startsWith("Script$") || classs.startsWith("MemberBox") ? "Atlas Script" : classs)  + " > ";
         logger.warn("{}{}", prefix, fastFormat(msg, List.of(args)));
     }
 
     public void error(String msg, Object... args) {
-        String prefix = STACK_WALKER.getCallerClass().getSimpleName() + " > ";
+        String classs = STACK_WALKER.getCallerClass().getSimpleName();
+        String prefix = (classs.startsWith("Script$") || classs.startsWith("MemberBox") ? "Atlas Script" : classs)  + " > ";
         logger.error("{}{}", prefix, fastFormat(msg, List.of(args)));
     }
 
     public void debug(String msg, Object... args) {
-        String prefix = STACK_WALKER.getCallerClass().getSimpleName() + " > ";
+        String classs = STACK_WALKER.getCallerClass().getSimpleName();
+        String prefix = (classs.startsWith("Script$") || classs.startsWith("MemberBox") ? "Atlas Script" : classs)  + " > ";
         if(AtlasApi.debug) logger.info("DEBUG | {}{}", prefix, fastFormat(msg, List.of(args)));
     }
 
@@ -52,7 +57,7 @@ public class AtlasLogger {
      * @return formatted string
      */
     public static String fastFormat(String str, List<Object> args) {
-        String finalStr = "";
+        StringBuilder finalStr = new StringBuilder();
         boolean fp = false;
         int i = 0;
 
@@ -60,30 +65,30 @@ public class AtlasLogger {
 
         for (char aChar : str.toCharArray()) {
             if (args.isEmpty()) {
-                finalStr += str.substring(i);
+                finalStr.append(str.substring(i));
                 break;
             }
 
             if (aChar == '}' && fp) {
-                finalStr += args.remove(0);
+                finalStr.append(args.removeFirst());
                 fp = false;
             } else if (aChar == '{') {
                 fp = true;
             } else {
                 if (fp) {
-                    finalStr += '{';
+                    finalStr.append('{');
                     fp = false;
                 }
-                finalStr += aChar;
+                finalStr.append(aChar);
             }
             i++;
         }
 
         if (fp) {
-            finalStr += "{";
+            finalStr.append("{");
         }
 
-        return finalStr;
+        return finalStr.toString();
     }
 
     public TimedLogger getTimed() {

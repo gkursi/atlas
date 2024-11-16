@@ -6,11 +6,17 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.entrypoint.EntrypointContainer;
 import net.fabricmc.loader.api.metadata.ModMetadata;
 import net.minecraft.client.MinecraftClient;
+import org.lwjgl.glfw.GLFW;
 import org.slf4j.LoggerFactory;
+import xyz.qweru.atlas.api.event.impl.KeyEvent;
 import xyz.qweru.atlas.api.event.impl.TickEvent;
 import xyz.qweru.atlas.api.manager.Managers;
+import xyz.qweru.atlas.api.manager.impl.ScriptManager;
 import xyz.qweru.atlas.api.script.AtlasScript;
 import xyz.qweru.atlas.api.script.AtlasScriptExecutor;
+import xyz.qweru.atlas.api.script.AtlasScriptFactory;
+import xyz.qweru.atlas.api.test.ScriptTest;
+import xyz.qweru.atlas.api.test.SettingTest;
 import xyz.qweru.atlas.util.annotations.AddonInfo;
 import xyz.qweru.atlas.util.misc.AtlasLogger;
 
@@ -23,6 +29,7 @@ public final class AtlasApi {
     public static final String MOD_ID = "Atlas";
     public static final AtlasLogger LOGGER = new AtlasLogger(LoggerFactory.getLogger(MOD_ID));
     public static final boolean debug = true;
+    public static final MinecraftClient mc = MinecraftClient.getInstance();
 
     static boolean init = false;
 
@@ -43,16 +50,25 @@ public final class AtlasApi {
         Managers.MODULE.init(addons);
         logger.debug("Initialized modules");
         AtlasScriptExecutor.init();
+        AtlasScriptExecutor.update();
         logger.debug("Initialized scripts");
-        AtlasScriptExecutor.execute(
-                new AtlasScript("TestScript", "test script", """
-            print('Atlas test script');
-            console.log('Env: ' + minecraftClient.getName();
-            
-            
-            """)
-        );
-        logger.debug("Ran script");
+        ScriptTest.scriptTest();
+        AtlasScript script = Managers.SCRIPT.add("Test script", "Description :3", """
+                for(var i = 0; i<25; i++) {
+                    logger.info(name + ', ' + description + ', ' + i);
+                    logger.warn("warning!");
+                }
+                """);
+
+        logger.debug("Compiled scripts");
+        AtlasScriptExecutor.execute(script);
+        logger.debug("Ran compiled script");
+        SettingTest.settingTest();
+        logger.debug("Finished tests");
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            LOGGER.info("Shutting down");
+            AtlasScriptExecutor.stop();
+        }));
         LOGGER.info("Finished!");
         init = true;
     }
@@ -93,5 +109,12 @@ public final class AtlasApi {
     @EventHandler
     static void tick(TickEvent e) {
         AtlasScriptExecutor.update();
+    }
+
+    @EventHandler
+    static void key(KeyEvent e) {
+        if(mc.currentScreen != null || e.getAction() != GLFW.GLFW_PRESS) return;
+        Managers.MODULE.handleKey(e.getKey());
+        Managers.SCRIPT.handleKey(e.getKey());
     }
 }

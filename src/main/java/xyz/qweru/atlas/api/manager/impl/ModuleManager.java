@@ -4,8 +4,8 @@ import oshi.util.tuples.Pair;
 import xyz.qweru.atlas.api.AtlasAddon;
 import xyz.qweru.atlas.api.AtlasApi;
 import xyz.qweru.atlas.api.manager.Manager;
-import xyz.qweru.atlas.api.manager.Managers;
 import xyz.qweru.atlas.api.module.AtlasModule;
+import xyz.qweru.atlas.api.settings.Setting;
 import xyz.qweru.atlas.util.annotations.ModuleInfo;
 
 import javax.annotation.Nullable;
@@ -28,19 +28,36 @@ public class ModuleManager extends Manager<Pair<AtlasModule, ModuleInfo>> {
         } else throw new RuntimeException("Module info is not present!");
     }
 
-    public @Nullable AtlasModule getModuleByClass(Class<?> c) {
+    public @Nullable Pair<AtlasModule, ModuleInfo> getModuleByClass(Class<?> c) {
         for (Pair<AtlasModule, ModuleInfo> data : getAll()) {
-            if(data.getA().getClass() == c) return data.getA();
+            if(data.getA().getClass() == c) return data;
         }
 
         return null;
     }
 
-    public @Nullable AtlasModule getModuleByID(String id) {
+    public @Nullable Pair<AtlasModule, ModuleInfo> getModuleByName(String name) {
         for (Pair<AtlasModule, ModuleInfo> data : getAll()) {
-            // todo
+            if(data.getB().name().equalsIgnoreCase(name)) return data;
         }
         return null;
+    }
+
+    public void handleKey(int key) {
+        for (Pair<AtlasModule, ModuleInfo> i : getAll()) {
+            if(i.getA().getBind() == key) {
+                AtlasApi.LOGGER.debug("Toggled module: {}", i.getB().name());
+                i.getA().toggle();
+            }
+            if(i.getA().isEnabled()) {
+                for (Setting setting : i.getA().getSettings()) {
+                    if(setting.getBind() == key) {
+                        AtlasApi.LOGGER.debug("Toggled setting: {}", setting.getName());
+                        setting.onBind();
+                    }
+                }
+            }
+        }
     }
 
 }
